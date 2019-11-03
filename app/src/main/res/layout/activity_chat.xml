@@ -1,0 +1,61 @@
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/chatColorTheme">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.stfalcon.chatkit.messages.MessagesList
+            android:id="@+id/rvMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/btn_service"
+            app:outcomingDefaultBubbleColor="@color/colorPrimary"
+            app:incomingDefaultBubbleColor="@color/warm_grey_four"
+            app:outcomingDefaultBubbleSelectedColor="@color/colorPrimaryDark" />
+
+        <include layout="@layout/view_divider" />
+
+        <com.stfalcon.chatkit.messages.MessageInput
+            android:id="@+id/inputMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/white"
+            app:attachmentButtonDefaultBgColor="@color/pinColorTheme"
+            app:attachmentButtonDefaultBgPressedColor="@color/colorPrimaryDark"
+            app:attachmentButtonDefaultIconColor="@color/white"
+            app:attachmentButtonDefaultIconPressedColor="@color/white"
+            app:inputButtonDefaultBgColor="@color/pinColorTheme"
+            app:inputButtonDefaultBgPressedColor="@color/colorPrimaryDark"
+            app:inputHint="Input Message Here"
+            app:showAttachmentButton="true"
+            tools:inputText="Input Message"/>
+        <Button
+            android:id="@+id/btn_service"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/inputMessage"
+            android:fontFamily="sans-serif-black"
+            android:backgroundTint="@color/pinColorTheme"
+            android:textSize="@dimen/dialog_message_text_size"
+            android:breakStrategy="balanced"
+            android:text="Click Here to Request for Service"
+            android:stateListAnimator="@android:interpolator/bounce"
+            />
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/loading"
+            style="@style/SpinKitView.CubeGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            app:SpinKit_Color="@color/colorAccent" />
+
+    </RelativeLayout>
+</android.support.v7.widget.LinearLayoutCompat>

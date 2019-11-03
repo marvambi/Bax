@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TGBHotels</string>
+    <string name="title_security">Security</string>
+    <string name="title_history">History</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_laundry">Laundary</string>
+    <string name="title_kitchen">Kitchen</string>
+</resources>
