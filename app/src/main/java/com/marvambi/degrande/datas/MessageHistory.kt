@@ -5,8 +5,11 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
 import org.joda.time.DateTime
 
+
+// Define the Messages model class by extending RealmObject
+
 @RealmClass
-open class MessageHistory(): RealmObject() {
+open class MessageHistory: RealmObject() {
     @PrimaryKey
     var id: String = ""
     var author: String = ""

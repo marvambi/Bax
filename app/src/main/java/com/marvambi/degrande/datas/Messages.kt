@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 
 // I Define the Messages model class by extending RealmObject
 @RealmClass
-open class Messages(): RealmObject() {
+open class Messages: RealmObject() {
     @PrimaryKey
     var id: String = ""
     var author: String = ""
