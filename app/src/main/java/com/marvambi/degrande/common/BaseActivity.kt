@@ -9,5 +9,7 @@ abstract class BaseActivity : AppCompatActivity(), BaseMvpView {
         super.onCreate(savedInstanceState)
 
         initPresenter()
+
+        onPause()
     }
 }

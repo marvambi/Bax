@@ -1,12 +1,11 @@
 package com.marvambi.degrande.ui.chat
 
 import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -20,13 +19,16 @@ import com.marvambi.degrande.datas.Message
 import com.marvambi.degrande.extensions.getAndroidId
 import com.marvambi.degrande.extensions.showToast
 import com.stfalcon.chatkit.commons.ImageLoader
-import com.stfalcon.chatkit.messages.MessagesListAdapter
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_chat.*
 import com.marvambi.degrande.datas.Messages
 import com.flutterwave.raveandroid.RavePayActivity
 import com.flutterwave.raveandroid.RaveConstants
 import com.marvambi.degrande.R
+import com.marvambi.degrande.db.BWOpenDBHelper
+import com.marvambi.degrande.db.HistoryMessage
+import com.marvambi.degrande.db.MessageModel
+import com.marvambi.degrande.ui.main.MessageHistoryAdapter
 import kotlinx.android.synthetic.main.guest_info_layout.view.*
 import org.joda.time.DateTime
 import java.util.*
@@ -39,15 +41,21 @@ class ChatActivity : BaseActivity(), ChatMvpView {
     }
 
     private lateinit var presenter: ChatPresenter<ChatMvpView>
-    private lateinit var messageAdapter: MessagesListAdapter<Message>
+    private lateinit var messageAdapter: MessageHistoryAdapter<Messages>
 
     private val userId by lazy { getAndroidId()}
 
-    val realm = Realm.getDefaultInstance()
+
+    lateinit var realm: Realm
     var messageChanel: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Realm.init(this)
+
+
+        realm = Realm.getDefaultInstance()
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         val sharedPreferences: SharedPreferences = this.getSharedPreferences("deviceinfo", Context.MODE_PRIVATE)
@@ -196,7 +204,7 @@ class ChatActivity : BaseActivity(), ChatMvpView {
 
 
     private fun initViewAdapter() {
-        messageAdapter = MessagesListAdapter(
+        messageAdapter = MessageHistoryAdapter(
                 userId,
                 getImageLoader()
         )
@@ -302,38 +310,84 @@ class ChatActivity : BaseActivity(), ChatMvpView {
         }
     }
 
+    override fun onPause() {
+        Log.w("ChatActivity", "Pausing the Chat Activity")
+        super.onPause()
+    }
+
     fun addRecord(message: Message) {
+
+
+        val allMessages = realm.where(Messages::class.java).equalTo("topic", messageChanel).findAll() //realm.where(Messages::class.java).equalTo("topic", messageChanel).findAll()
+
+
+        /*if (!allMessages.isEmpty()) {
+            //Clear the messageAdapter and renew the data
+            allMessages.forEach { msg ->
+                var net = mutableListOf<Messages>()
+                messageAdapter.deleteById(msg.id) //Remove and add back the message to the list to avoid duplicates
+                net.add(msg)
+                Toast.makeText(applicationContext, "Author-> ${msg.author}  ClientId-> ${msg.id}", Toast.LENGTH_SHORT).show()
+                //Update the Chat Message List currently in view
+                messageAdapter.addToStart(message, true)
+                //messageAdapter.addToEnd(net, false)
+            }
+
+        }*/
 
         if (!isNetworkAvailable()) {
             Toast.makeText(applicationContext, "Oops... Please connect to a reliable network!", Toast.LENGTH_LONG).show()
         } else {
-            realm.beginTransaction()
+            //val newMsg: Message = message.copy()
+            var existing: Int = 0
+            if (!allMessages.isEmpty()) {
+                allMessages.forEach { msg ->
+                    if (msg.id == message.id) {
+                        existing += 1
+                    }
+                    Log.w("Existing count: ${msg.id} X-> ",existing.toString())
+                }
 
+                val dbHandler = BWOpenDBHelper(this)
+                val msgHistory = MessageModel(message.id, message.user, messageChanel!!, message.text, message.createdAt.time)
+                var result = dbHandler.insertMessage(msgHistory)
+                when(result) {
+                    true -> { Log.w("Added", msgHistory.text + " Added to database") }
+                    false -> { Log.w("Error", msgHistory.text + " could not be added to database") }
+                }
 
-            val msgId = System.currentTimeMillis().toString()
-            val msg = realm.createObject(Messages::class.java, msgId)
-            msg.txtMsg = message.text
-            msg.author = Author(name = getAndroidId(), id = getAndroidId()).toString()
-            msg.topic = messageChanel.toString()
-            msg.createAt = DateTime.now().millis
-            //msg.id = message.id
+                //check the size of existing var
+                if (existing == 0) {
+                    //Particular message does not exist so add it too
+                    val msgId = System.currentTimeMillis().toString()
+                    realm.beginTransaction()
+                    val msg = realm.createObject(Messages::class.java, msgId)
+                    msg.txtMsg = message.text
+                    msg.author = message.user.toString() //Author(name = getAndroidId(), id = getAndroidId())
+                    msg.topic = messageChanel.toString()
+                    msg.createAt = DateTime.now().millis
+                    //msg.id = message.id
 
-            realm.commitTransaction()
-            Toast.makeText(applicationContext, "Saved the message", Toast.LENGTH_LONG).show()
-        }
+                    realm.commitTransaction()
+                    Toast.makeText(applicationContext, "Saved new message", Toast.LENGTH_LONG).show()
+                    messageAdapter.notifyDataSetChanged()
 
+                }
+            } else {
+                //Empty set
+                val msgId = System.currentTimeMillis().toString()
+                realm.beginTransaction()
+                val msg = realm.createObject(Messages::class.java, msgId)
+                msg.txtMsg = message.text
+                msg.author = message.user.toString() //Author(name = getAndroidId(), id = getAndroidId())
+                msg.topic = messageChanel.toString()
+                msg.createAt = DateTime.now().millis
+                //msg.id = message.id
 
-        val allMessages = realm.where(Messages::class.java).contains("author", getAndroidId()).not().equalTo("topic", messageChanel).findAll() //realm.where(Messages::class.java).equalTo("topic", messageChanel).findAll()
-        if (!allMessages.isEmpty()) {
-            //Clear the messageAdapter and renew the data
-            allMessages.forEach { msg ->
-                var net = mutableListOf<Message>()
-                messageAdapter.deleteById(msg.id) //Remove and add back the message to the list to avoid duplicates
-                net.add(Message(msg.id,msg.createAt, Author(getAndroidId(), msg.author, ""), msg.txtMsg))
-                //Toast.makeText(applicationContext, "Author-> ${msg.author}  ClientId-> ${msg.id}", Toast.LENGTH_SHORT).show()
-                //Update the Chat Message List currently in view
-                messageAdapter.addToStart(Message(msg.id,msg.createAt, Author(getAndroidId(), msg.author, ""), msg.txtMsg), true)
-                //messageAdapter.addToEnd(net, false)
+                realm.commitTransaction()
+                Toast.makeText(applicationContext, "Saved Another message: " + msg.author, Toast.LENGTH_LONG).show()
+
+                messageAdapter.notifyDataSetChanged()
             }
 
         }

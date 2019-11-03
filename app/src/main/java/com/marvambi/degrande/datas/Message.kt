@@ -6,15 +6,21 @@ import java.util.*
 
 data class Message(
         private var id: String = "",
-        private var createdAt: Long = DateTime.now().millis,
         private var author: Author,
-        private var text: String = ""
+        private var topic: String = "",
+        private var text: String = "",
+        private var createdAt: Long = DateTime.now().millis
+
+
 ) : IMessage {
     override fun getId() = id
-
-    override fun getCreatedAt() = Date(createdAt)
-
     override fun getUser() = author
 
     override fun getText() = text
+
+    override fun getCreatedAt() = Date(createdAt)
+
+    fun getTopic() = topic
+
+
 }

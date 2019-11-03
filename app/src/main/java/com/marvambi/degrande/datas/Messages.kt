@@ -11,7 +11,7 @@ import org.joda.time.DateTime
 open class Messages: RealmObject() {
     @PrimaryKey
     var id: String = ""
-    var author: String = ""
+    var author: String = Author().toString()
     var topic: String = ""
     var txtMsg: String = ""
     var createAt: Long = DateTime.now().millis

@@ -1,8 +1,12 @@
 package com.marvambi.degrande.ui.main
 
+import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import com.marvambi.degrande.R
 import com.marvambi.degrande.common.BaseActivity
 import com.marvambi.degrande.datas.ChatRoom
@@ -46,6 +50,12 @@ class MainActivity : BaseActivity(), MainMvpView {
         rvChatRooms.adapter = chatRoomAdapter
 
         presenter.loadChatRooms()
+    }
+
+    override fun onPause() {
+        //d
+        Log.w("MainActivity", "Pausing Main Activity")
+        super.onPause()
     }
 
 
