@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.Marvin" parent="AppTheme">
+        <item name="android:windowBackground">@color/chatColorTheme</item>
+        <item name="controlBackground">@drawable/ic_chat_red_24dp</item>
+    </style>
+
 </resources>
