@@ -64,5 +64,4 @@ class MainActivity : BaseActivity(), MainMvpView {
         super.onPause()
     }
 
-
 }

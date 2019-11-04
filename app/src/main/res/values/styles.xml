@@ -10,7 +10,12 @@
 
     <style name="AppTheme.Marvin" parent="AppTheme">
         <item name="android:windowBackground">@color/chatColorTheme</item>
+        <item name="android:windowDisablePreview">true</item>
         <item name="controlBackground">@drawable/bubble_circle</item>
+    </style>
+
+    <style name="AppTheme.CenterAnimation">
+        <item name="android:windowBackground">@drawable/ic_wingfly</item>
     </style>
 
 </resources>

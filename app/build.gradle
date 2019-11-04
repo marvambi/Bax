@@ -21,9 +21,11 @@ android {
         }
     }
 
-    configurations.all{ resolutionStrategy{
-        exclude group: 'com.android.support', module: 'support-v13'
-    }}
+    configurations.all {
+        resolutionStrategy {
+            exclude group: 'com.android.support', module: 'support-v13'
+        }
+    }
 }
 
 realm {
