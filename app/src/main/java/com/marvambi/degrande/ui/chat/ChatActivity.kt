@@ -2,7 +2,6 @@ package com.marvambi.degrande.ui.chat
 
 import android.app.AlertDialog
 import android.content.*
-import com.google.gson.*
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
@@ -26,12 +25,9 @@ import com.flutterwave.raveandroid.RavePayActivity
 import com.flutterwave.raveandroid.RaveConstants
 import com.marvambi.degrande.R
 import com.marvambi.degrande.db.BWOpenDBHelper
-import com.marvambi.degrande.db.HistoryMessage
 import com.marvambi.degrande.db.MessageModel
 import com.marvambi.degrande.ui.main.MessageHistoryAdapter
 import kotlinx.android.synthetic.main.guest_info_layout.view.*
-import org.joda.time.DateTime
-import org.json.JSONArray
 import java.util.*
 
 

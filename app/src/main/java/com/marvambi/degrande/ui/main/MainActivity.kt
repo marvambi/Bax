@@ -5,7 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import com.marvambi.degrande.R
 import com.marvambi.degrande.common.BaseActivity
@@ -46,7 +46,7 @@ class MainActivity : BaseActivity(), MainMvpView {
             startActivity(intent)
         }
 
-        rvChatRooms.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rvChatRooms.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         rvChatRooms.adapter = chatRoomAdapter
 
         presenter.loadChatRooms()

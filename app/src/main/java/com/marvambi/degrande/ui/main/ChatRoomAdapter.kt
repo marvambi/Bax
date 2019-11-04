@@ -1,6 +1,6 @@
 package com.marvambi.degrande.ui.main
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import cn.carbs.android.avatarimageview.library.AvatarImageView
@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.viewholder_chat_room.view.*
 import java.util.*
 import kotlin.math.abs
 
-internal class ChatRoomAdapter(val action: (chatRoom: ChatRoom) -> Unit) : RecyclerView.Adapter<ChatRoomAdapter.ViewHolder>() {
+internal class ChatRoomAdapter(val action: (chatRoom: ChatRoom) -> Unit) : androidx.recyclerview.widget.RecyclerView.Adapter<ChatRoomAdapter.ViewHolder>() {
 
     private val chatRooms = ArrayList<ChatRoom>()
 
@@ -49,7 +49,7 @@ internal class ChatRoomAdapter(val action: (chatRoom: ChatRoom) -> Unit) : Recyc
     }
 
     internal inner class ViewHolder(parent: ViewGroup)
-        : RecyclerView.ViewHolder(LayoutInflater.from(parent.context)
+        : androidx.recyclerview.widget.RecyclerView.ViewHolder(LayoutInflater.from(parent.context)
             .inflate(R.layout.viewholder_chat_room, parent, false)) {
 
         fun draw(chatRoom: ChatRoom) {
