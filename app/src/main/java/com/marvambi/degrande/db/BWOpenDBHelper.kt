@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import com.marvambi.degrande.datas.Author
 
 
@@ -65,30 +64,32 @@ class BWOpenDBHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return true
     }
 
-    fun readMessage(msgid: String): ArrayList<MessageModel> {
+    fun readMessage(tpic: String): ArrayList<MessageModel> {
         val messages = ArrayList<MessageModel>()
         val db = writableDatabase
         var cursor: Cursor? = null
         try {
-            cursor = db.rawQuery("select * from " + DBContract.MessageEntry.TABLE_NAME + " WHERE " + DBContract.MessageEntry.COLUMN_ID + "='" + msgid + "'", null)
+            cursor = db.rawQuery("select * from " + DBContract.MessageEntry.TABLE_NAME + " WHERE " + DBContract.MessageEntry.COLUMN_TOPIC + "='" + tpic + "'", null)
         } catch (e: SQLiteException) {
             // if table not yet present, create it
-            db.execSQL(SQL_CREATE_ENTRIES)
+            //db.execSQL(SQL_CREATE_ENTRIES)
             return ArrayList()
         }
 
+        var id: String
         var author: Author
         var text: String
         var topic: String
         var createAt: Long
         if (cursor!!.moveToFirst()) {
             while (cursor.isAfterLast == false) {
+                id = cursor.getString(cursor.getColumnIndex(DBContract.MessageEntry.COLUMN_ID))
                 author = Author(cursor.getString(cursor.getColumnIndex(DBContract.MessageEntry.COLUMN_AUTHOR)))
                 text = cursor.getString(cursor.getColumnIndex(DBContract.MessageEntry.COLUMN_TEXT))
                 topic = cursor.getString(cursor.getColumnIndex(DBContract.MessageEntry.COLUMN_TOPIC))
                 createAt = cursor.getLong(cursor.getColumnIndex(DBContract.MessageEntry.COLUMN_CREATEAT))
 
-                messages.add(MessageModel(msgid, author, topic, text, createAt))
+                messages.add(MessageModel(id, author, topic, text, createAt))
                 cursor.moveToNext()
             }
         }

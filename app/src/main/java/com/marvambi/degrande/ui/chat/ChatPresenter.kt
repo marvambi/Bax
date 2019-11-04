@@ -57,6 +57,7 @@ class ChatPresenter<MvpView : BaseMvpView> : RxPresenter(), BaseMvpPresenter<Mvp
             val messageid = (1..12340).shuffled().first()
             val creationtime = DateTime.now().millis
             val message = Message(author = mqttManager.author, text = input.toString(), id = messageid.toString(), createdAt = creationtime)
+
             it.onSuccess(gson.toJson(message))
         }.onMain().subscribe({
             mqttManager.publish(it)

@@ -2,7 +2,7 @@ package com.marvambi.degrande.ui.chat
 
 import android.app.AlertDialog
 import android.content.*
-import android.content.pm.PackageManager
+import com.google.gson.*
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
@@ -31,6 +31,7 @@ import com.marvambi.degrande.db.MessageModel
 import com.marvambi.degrande.ui.main.MessageHistoryAdapter
 import kotlinx.android.synthetic.main.guest_info_layout.view.*
 import org.joda.time.DateTime
+import org.json.JSONArray
 import java.util.*
 
 
@@ -317,79 +318,37 @@ class ChatActivity : BaseActivity(), ChatMvpView {
 
     fun addRecord(message: Message) {
 
-
-        val allMessages = realm.where(Messages::class.java).equalTo("topic", messageChanel).findAll() //realm.where(Messages::class.java).equalTo("topic", messageChanel).findAll()
-
-
-        /*if (!allMessages.isEmpty()) {
-            //Clear the messageAdapter and renew the data
-            allMessages.forEach { msg ->
-                var net = mutableListOf<Messages>()
-                messageAdapter.deleteById(msg.id) //Remove and add back the message to the list to avoid duplicates
-                net.add(msg)
-                Toast.makeText(applicationContext, "Author-> ${msg.author}  ClientId-> ${msg.id}", Toast.LENGTH_SHORT).show()
-                //Update the Chat Message List currently in view
-                messageAdapter.addToStart(message, true)
-                //messageAdapter.addToEnd(net, false)
-            }
-
-        }*/
+        /**
+         * Experiment
+         */
 
         if (!isNetworkAvailable()) {
             Toast.makeText(applicationContext, "Oops... Please connect to a reliable network!", Toast.LENGTH_LONG).show()
         } else {
-            //val newMsg: Message = message.copy()
-            var existing: Int = 0
-            if (!allMessages.isEmpty()) {
-                allMessages.forEach { msg ->
-                    if (msg.id == message.id) {
-                        existing += 1
-                    }
-                    Log.w("Existing count: ${msg.id} X-> ",existing.toString())
-                }
 
-                val dbHandler = BWOpenDBHelper(this)
-                val msgHistory = MessageModel(message.id, message.user, messageChanel!!, message.text, message.createdAt.time)
-                var result = dbHandler.insertMessage(msgHistory)
-                when(result) {
-                    true -> { Log.w("Added", msgHistory.text + " Added to database") }
-                    false -> { Log.w("Error", msgHistory.text + " could not be added to database") }
-                }
-
-                //check the size of existing var
-                if (existing == 0) {
-                    //Particular message does not exist so add it too
-                    val msgId = System.currentTimeMillis().toString()
-                    realm.beginTransaction()
-                    val msg = realm.createObject(Messages::class.java, msgId)
-                    msg.txtMsg = message.text
-                    msg.author = message.user.toString() //Author(name = getAndroidId(), id = getAndroidId())
-                    msg.topic = messageChanel.toString()
-                    msg.createAt = DateTime.now().millis
-                    //msg.id = message.id
-
-                    realm.commitTransaction()
-                    Toast.makeText(applicationContext, "Saved new message", Toast.LENGTH_LONG).show()
-                    messageAdapter.notifyDataSetChanged()
-
-                }
-            } else {
-                //Empty set
-                val msgId = System.currentTimeMillis().toString()
-                realm.beginTransaction()
-                val msg = realm.createObject(Messages::class.java, msgId)
-                msg.txtMsg = message.text
-                msg.author = message.user.toString() //Author(name = getAndroidId(), id = getAndroidId())
-                msg.topic = messageChanel.toString()
-                msg.createAt = DateTime.now().millis
-                //msg.id = message.id
-
-                realm.commitTransaction()
-                Toast.makeText(applicationContext, "Saved Another message: " + msg.author, Toast.LENGTH_LONG).show()
-
-                messageAdapter.notifyDataSetChanged()
+            val dbHandler = BWOpenDBHelper(this)
+            val msgHistory = MessageModel(message.id, message.user, messageChanel!!, message.text, message.createdAt.time)
+            //var result = dbHandler.insertMessage(msgHistory)
+            val msgs = dbHandler.readMessage(messageChanel!!)
+            when(dbHandler.insertMessage(msgHistory)) {
+                true -> {
+                    Log.w("COUNT", "There are ${msgs.count()} $messageChanel messages in the db")
+                    Log.w("Added", msgHistory.text + " Added to database") }
+                false -> {
+                    Log.w("Error", "${msgHistory.text} could not be added to database")
+                    Log.w("COUNT", "There are ${msgs.count()} $messageChanel messages in the db") }
             }
 
+            /**
+             * Remodel Message class from MessageModel to convert easily into MessageHolder's expectation
+             */
+
+            msgs.forEach {
+                val msgHistory = Message(it.id, it.author, messageChanel!!, it.text, it.createAt)
+                messageAdapter.deleteById(it.id)
+                messageAdapter.addToStart(msgHistory, true)
+            }
+            messageAdapter.notifyDataSetChanged() //.addToEnd(msgs,true)
         }
 
 
